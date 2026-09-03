@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { markNotificationRead, markAllNotificationsRead } from "@/app/actions/notifications";
-import { Notification, NotificationType } from "@/types/database.types";
+import { Notification } from "@/types/database.types";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
@@ -64,16 +64,20 @@ export function NotificationsCenter({ initialNotifications, userRole }: Notifica
     }
   };
 
-  const getIcon = (type: NotificationType) => {
+  const getIcon = (type: string) => {
     switch (type) {
       case "new_request":
         return <CalendarPlus className="h-5 w-5 text-[#ea580c]" />;
       case "request_accepted":
+      case "verification_approved":
         return <CheckCircle2 className="h-5 w-5 text-emerald-600" />;
       case "request_declined":
       case "request_cancelled":
+      case "verification_rejected":
+      case "account_suspended":
         return <XCircle className="h-5 w-5 text-red-500" />;
       case "request_completed":
+      case "report_resolved":
         return <CheckCheck className="h-5 w-5 text-blue-600" />;
       case "new_review":
         return <Star className="h-5 w-5 text-amber-500 fill-amber-500" />;

@@ -4,17 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ServiceRequestStatus } from "@/types/database.types";
 import { RequestStatusBadge } from "@/components/requests/RequestStatusBadge";
-import { formatNaira } from "@/lib/utils";
-import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import {
-  Inbox,
   Search,
   MapPin,
-  Calendar,
   ExternalLink,
-  User,
-  Briefcase,
 } from "lucide-react";
 
 export interface AdminRequestItem {

@@ -5,13 +5,11 @@ import { ReportModal } from "@/components/reports/ReportModal";
 import { Flag } from "lucide-react";
 
 interface ArtisanReportButtonProps {
-  artisanId: string;
   artisanUserId: string;
   businessName: string;
 }
 
 export function ArtisanReportButton({
-  artisanId,
   artisanUserId,
   businessName,
 }: ArtisanReportButtonProps) {

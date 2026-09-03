@@ -21,7 +21,7 @@ import {
   Layers,
 } from "lucide-react";
 import { ArtisanAvailabilityToggle } from "@/components/artisan/ArtisanAvailabilityToggle";
-import { ArtisanProfile, Service } from "@/types/database.types";
+import { ArtisanProfile, Service, AvailabilityStatus } from "@/types/database.types";
 import { formatNaira } from "@/lib/utils";
 
 export const metadata = {
@@ -151,7 +151,7 @@ export default async function ArtisanDashboardPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2 lg:pt-0">
-          <ArtisanAvailabilityToggle currentStatus={typedArtisan.availability_status} />
+          <ArtisanAvailabilityToggle currentStatus={typedArtisan.availability_status as AvailabilityStatus} />
 
           <Link href={`/artisans/${typedArtisan.id}`} target="_blank">
             <Button variant="outline" size="sm" className="gap-1.5 text-xs text-[#0f2942]">

@@ -7,7 +7,6 @@ import { VerificationStatus } from "@/types/database.types";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -16,7 +15,6 @@ import {
   XCircle,
   ExternalLink,
   MapPin,
-  Briefcase,
   AlertCircle,
   Loader2,
   Calendar,

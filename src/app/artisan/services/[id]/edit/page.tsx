@@ -47,10 +47,21 @@ export default async function EditServicePage({ params }: EditServicePageProps) 
     notFound();
   }
 
+  // 3. Fetch artisan user profile for photo
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <DashboardNav role="artisan" />
-      <ServiceForm initialService={service as Service} isEditing={true} />
+      <ServiceForm
+        initialService={service as Service}
+        initialArtisanPhoto={profile?.avatar_url || null}
+        isEditing={true}
+      />
     </div>
   );
 }

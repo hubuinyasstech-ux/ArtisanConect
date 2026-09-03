@@ -18,10 +18,16 @@ export default async function NewServicePage() {
     redirect("/login?redirect=/artisan/services/new");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <DashboardNav role="artisan" />
-      <ServiceForm />
+      <ServiceForm initialArtisanPhoto={profile?.avatar_url || null} />
     </div>
   );
 }

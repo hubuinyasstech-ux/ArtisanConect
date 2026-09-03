@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { markNotificationRead, markAllNotificationsRead } from "@/app/actions/notifications";
-import { Notification, NotificationType } from "@/types/database.types";
+import { Notification } from "@/types/database.types";
 import {
   Bell,
   CheckCheck,
@@ -121,16 +121,20 @@ export function NotificationBell({ userRole = "customer" }: NotificationBellProp
     }
   };
 
-  const getIcon = (type: NotificationType) => {
+  const getIcon = (type: string) => {
     switch (type) {
       case "new_request":
         return <CalendarPlus className="h-4 w-4 text-[#ea580c]" />;
       case "request_accepted":
+      case "verification_approved":
         return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
       case "request_declined":
       case "request_cancelled":
+      case "verification_rejected":
+      case "account_suspended":
         return <XCircle className="h-4 w-4 text-red-500" />;
       case "request_completed":
+      case "report_resolved":
         return <CheckCheck className="h-4 w-4 text-blue-600" />;
       case "new_review":
         return <Star className="h-4 w-4 text-amber-500 fill-amber-500" />;

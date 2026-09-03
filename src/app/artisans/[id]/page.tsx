@@ -28,6 +28,7 @@ interface ArtisanPublicProfilePageProps {
 
 interface PublicArtisanDetail {
   id: string;
+  user_id: string;
   business_name: string;
   category: string;
   years_experience: number;
@@ -118,6 +119,7 @@ export default async function ArtisanPublicProfilePage({
 
     profileData = {
       id: artisan.id,
+      user_id: artisan.user_id,
       business_name: artisan.business_name || rawProfile?.full_name || "Skilled Artisan",
       category: artisan.category || "Plumbing",
       years_experience: artisan.years_experience ?? 1,
@@ -144,6 +146,7 @@ export default async function ArtisanPublicProfilePage({
     const demos: Record<string, PublicArtisanDetail & { services?: PublicServiceDetail[] }> = {
       "demo-plumber-1": {
         id: "demo-plumber-1",
+        user_id: "demo-user-1",
         business_name: "Adeleke Rapid Plumbing Works",
         category: "Plumbing",
         years_experience: 8,
@@ -183,6 +186,7 @@ export default async function ArtisanPublicProfilePage({
       },
       "demo-electrician-2": {
         id: "demo-electrician-2",
+        user_id: "demo-user-2",
         business_name: "Ogunleye Electrical & Solar Systems",
         category: "Electrical",
         years_experience: 10,
@@ -214,6 +218,7 @@ export default async function ArtisanPublicProfilePage({
       },
       "demo-carpenter-3": {
         id: "demo-carpenter-3",
+        user_id: "demo-user-3",
         business_name: "Heritage Woodwork & Roofing",
         category: "Carpentry",
         years_experience: 12,
@@ -237,6 +242,7 @@ export default async function ArtisanPublicProfilePage({
       },
       "demo-painter-4": {
         id: "demo-painter-4",
+        user_id: "demo-user-4",
         business_name: "BrightCoat Screeding & Painting",
         category: "Painting",
         years_experience: 6,
@@ -260,6 +266,7 @@ export default async function ArtisanPublicProfilePage({
       },
       "demo-cleaner-5": {
         id: "demo-cleaner-5",
+        user_id: "demo-user-5",
         business_name: "SparkleClean Facility Care",
         category: "Cleaning",
         years_experience: 5,
@@ -596,7 +603,6 @@ export default async function ArtisanPublicProfilePage({
 
           <div className="text-center pt-2">
             <ArtisanReportButton
-              artisanId={profileData.id}
               artisanUserId={profileData.user_id}
               businessName={profileData.business_name}
             />

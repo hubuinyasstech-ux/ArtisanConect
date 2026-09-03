@@ -6,10 +6,8 @@ import { suspendUser, reactivateUser } from "@/app/actions/admin";
 import { UserRole, AccountStatus } from "@/types/database.types";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
-  Users,
   Search,
   ShieldAlert,
   CheckCircle2,
@@ -17,7 +15,6 @@ import {
   Ban,
   RotateCcw,
   Loader2,
-  Calendar,
   MapPin,
   Mail,
   ExternalLink,

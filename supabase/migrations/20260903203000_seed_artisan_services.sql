@@ -3,9 +3,9 @@
 -- ==========================================================
 
 -- 1. Starter plumbing services for Adisa Kabiru
-insert into public.services (artisan_id, title, category, price, location, description, is_active)
+insert into services (artisan_id, title, category, price, location, description, is_active)
 select 
-  '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid,
+  cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid),
   'Emergency Pipe Leak & Burst Repair',
   'Plumbing',
   5000,
@@ -13,14 +13,14 @@ select
   'Rapid diagnostic and sealing of leaking pipes, burst water conduits, and drainage overflow.',
   true
 where exists (
-  select 1 from public.artisan_profiles where id = '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid
+  select 1 from artisan_profiles where id = cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid)
 ) and not exists (
-  select 1 from public.services where artisan_id = '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid and title = 'Emergency Pipe Leak & Burst Repair'
+  select 1 from services where artisan_id = cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid) and title = 'Emergency Pipe Leak & Burst Repair'
 );
 
-insert into public.services (artisan_id, title, category, price, location, description, is_active)
+insert into services (artisan_id, title, category, price, location, description, is_active)
 select 
-  '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid,
+  cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid),
   'Bathroom Fixture, Basin & Tank Fitting',
   'Plumbing',
   15000,
@@ -28,7 +28,7 @@ select
   'Installation and maintenance of toilet seats, water heaters, wash basins, and overhead PVC water storage tanks.',
   true
 where exists (
-  select 1 from public.artisan_profiles where id = '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid
+  select 1 from artisan_profiles where id = cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid)
 ) and not exists (
-  select 1 from public.services where artisan_id = '52d1388c-0d8a-41e8-bc33-d1f4f693b692'::uuid and title = 'Bathroom Fixture, Basin & Tank Fitting'
+  select 1 from services where artisan_id = cast('52d1388c-0d8a-41e8-bc33-d1f4f693b692' as uuid) and title = 'Bathroom Fixture, Basin & Tank Fitting'
 );

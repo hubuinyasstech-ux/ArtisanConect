@@ -5,13 +5,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key";
 
 export async function updateSession(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: requestHeaders,
+    },
   });
 
   // Skip supabase auth if placeholder URL is still configured
   if (supabaseUrl.includes("placeholder")) {
-    return { supabaseResponse, user: null, userRole: null };
+    return { supabaseResponse, user: null, userRole: null, userStatus: "active" };
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -22,7 +27,9 @@ export async function updateSession(request: NextRequest) {
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         supabaseResponse = NextResponse.next({
-          request,
+          request: {
+            headers: requestHeaders,
+          },
         });
         cookiesToSet.forEach(({ name, value, options }) =>
           supabaseResponse.cookies.set(name, value, options)
@@ -41,16 +48,28 @@ export async function updateSession(request: NextRequest) {
 
   if (user) {
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileErr } = await supabase
         .from("profiles")
         .select("role, status")
         .eq("id", user.id)
         .maybeSingle();
 
-      userRole = profile?.role || user.user_metadata?.role || "customer";
+      if (profileErr) {
+        console.warn("Middleware profile lookup warning:", profileErr.message);
+      }
+
+      userRole =
+        profile?.role ||
+        (user.app_metadata?.role as string) ||
+        (user.user_metadata?.role as string) ||
+        "customer";
       userStatus = profile?.status || "active";
-    } catch {
-      userRole = user.user_metadata?.role || "customer";
+    } catch (err) {
+      console.warn("Middleware profile exception:", err);
+      userRole =
+        (user.app_metadata?.role as string) ||
+        (user.user_metadata?.role as string) ||
+        "customer";
       userStatus = "active";
     }
   }

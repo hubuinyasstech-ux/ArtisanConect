@@ -3,7 +3,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/admin";
-import { AdminNav } from "@/components/layout/AdminNav";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import {
@@ -13,15 +12,10 @@ import {
   Inbox,
   Star,
   ShieldCheck,
-  Clock,
   AlertTriangle,
   ArrowRight,
-  TrendingUp,
   MapPin,
-  CheckCircle2,
-  Calendar,
 } from "lucide-react";
-import { formatNaira } from "@/lib/utils";
 
 export const metadata = {
   title: "Platform Overview — Admin Console",
@@ -63,64 +57,52 @@ export default async function AdminDashboardPage() {
   ]);
 
   // 2. Fetch Recent Activities
-  const [{ data: recentUsers }, { data: recentRequests }, { data: recentReports }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, full_name, email, role, created_at, status")
-        .order("created_at", { ascending: false })
-        .limit(5),
-      supabase
-        .from("service_requests")
-        .select(`
-          id,
-          status,
-          created_at,
-          location,
-          profiles!service_requests_customer_id_fkey (
-            full_name
-          ),
-          artisan_profiles (
-            business_name
-          )
-        `)
-        .order("created_at", { ascending: false })
-        .limit(5),
-      supabase
-        .from("reports")
-        .select("id, reason, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(4),
-    ]);
+  const [{ data: recentUsers }, { data: recentRequests }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, email, role, created_at, status")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("service_requests")
+      .select(`
+        id,
+        status,
+        created_at,
+        location,
+        profiles!service_requests_customer_id_fkey (
+          full_name
+        ),
+        artisan_profiles (
+          business_name
+        )
+      `)
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-900 text-white p-6 sm:p-8 rounded-3xl shadow-sm">
-        <div className="space-y-1.5">
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80">
+        <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black">Platform Administration</h1>
+            <h1 className="text-2xl font-black text-[#0f2942] tracking-tight">Platform Overview</h1>
             <Badge variant="danger" className="text-[10px] font-bold">
               Administrator
             </Badge>
           </div>
-          <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
+          <p className="text-xs text-slate-500 mt-1">
             Marketplace governance, artisan vetting, service moderation, and ecosystem health monitoring across
             Osogbo, Osun State.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-neutral-800 text-xs text-neutral-300 shrink-0">
-          <MapPin className="h-4 w-4 text-emerald-400" />
-          <span>Active Pilot: Osogbo</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white border border-slate-200/90 text-xs text-slate-600 shadow-2xs shrink-0 self-start sm:self-center">
+          <MapPin className="h-4 w-4 text-emerald-600" />
+          <span className="font-semibold">Osogbo Pilot Active</span>
         </div>
       </div>
-
-      {/* Admin Navigation */}
-      <AdminNav
-        pendingVerifications={pendingVerifications || 0}
-        openReports={openReports || 0}
-      />
 
       {/* Action Required Banner if Pending Verifications or Open Reports */}
       {((pendingVerifications || 0) > 0 || (openReports || 0) > 0) && (
@@ -215,9 +197,10 @@ export default async function AdminDashboardPage() {
               <Inbox className="h-4 w-4 text-[#ea580c]" />
             </div>
             <p className="text-2xl font-black text-[#0f2942]">{totalRequests || 0}</p>
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>{completedRequests || 0} completed</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="text-emerald-600 font-semibold">{completedRequests || 0} done</span>
+              <span>•</span>
+              <span className="text-amber-600 font-semibold">{pendingRequests || 0} pending</span>
             </div>
           </div>
         </Card>

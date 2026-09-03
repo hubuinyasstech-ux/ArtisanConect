@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardNav } from "@/components/layout/DashboardNav";
@@ -9,11 +8,8 @@ import { Card, CardContent } from "@/components/ui/Card";
 import {
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
   HelpCircle,
   Award,
-  Users,
-  Building,
 } from "lucide-react";
 
 export const metadata = {

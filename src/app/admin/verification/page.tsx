@@ -2,13 +2,12 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/admin";
-import { AdminNav } from "@/components/layout/AdminNav";
 import {
   AdminVerificationTable,
   AdminArtisanVerificationItem,
 } from "@/components/admin/AdminVerificationTable";
 import { VerificationStatus } from "@/types/database.types";
-import { ShieldCheck, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export const metadata = {
   title: "Artisan Verification Desk — Admin Console",
@@ -44,17 +43,6 @@ export default async function AdminVerificationPage() {
     `)
     .order("verification_requested_at", { ascending: false, nullsFirst: false });
 
-  // Count open reports and pending verifications for nav badges
-  const { count: pendingVerifications } = await supabase
-    .from("artisan_profiles")
-    .select("*", { count: "exact", head: true })
-    .eq("verification_status", "pending");
-
-  const { count: openReports } = await supabase
-    .from("reports")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "open");
-
   const formattedArtisans: AdminArtisanVerificationItem[] = (artisans || []).map((a) => {
     const owner = Array.isArray(a.profiles) ? a.profiles[0] : a.profiles;
     return {
@@ -75,33 +63,25 @@ export default async function AdminVerificationPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-900 text-white p-6 sm:p-8 rounded-3xl shadow-sm">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-              Governance & Vetting
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black">Artisan Verification Review Desk</h1>
-          <p className="text-xs text-neutral-400 max-w-2xl">
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#ea580c]">
+            Governance & Vetting
+          </span>
+          <h1 className="text-2xl font-black text-[#0f2942] tracking-tight">Artisan Verification Review Desk</h1>
+          <p className="text-xs text-slate-500 mt-1">
             Review trade credential submissions from local Osogbo service providers. Approving grants the verified
             badge and elevates discovery ranking.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-neutral-800 text-xs text-neutral-300 shrink-0">
-          <MapPin className="h-4 w-4 text-emerald-400" />
-          <span>Osogbo Pilot Jurisdiction</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white border border-slate-200/90 text-xs text-slate-600 shadow-2xs shrink-0 self-start sm:self-center">
+          <MapPin className="h-4 w-4 text-emerald-600" />
+          <span className="font-semibold">Osogbo Pilot Jurisdiction</span>
         </div>
       </div>
-
-      {/* Admin Navigation */}
-      <AdminNav
-        pendingVerifications={pendingVerifications || 0}
-        openReports={openReports || 0}
-      />
 
       {/* Verification Table */}
       <AdminVerificationTable initialArtisans={formattedArtisans} />

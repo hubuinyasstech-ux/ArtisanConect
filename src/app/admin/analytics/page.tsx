@@ -2,22 +2,18 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/admin";
-import { AdminNav } from "@/components/layout/AdminNav";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { formatNaira } from "@/lib/utils";
 import {
   BarChart3,
   TrendingUp,
   Users,
-  Briefcase,
   Layers,
   Inbox,
   Star,
-  ShieldCheck,
   CheckCircle2,
   XCircle,
   Clock,
-  PieChart,
 } from "lucide-react";
 
 export const metadata = {
@@ -39,14 +35,12 @@ export default async function AdminAnalyticsPage() {
     { count: totalArtisans },
     { count: totalSuspended },
     { count: verifiedArtisans },
-    { count: pendingVerifications },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "customer"),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "artisan"),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("status", "suspended"),
     supabase.from("artisan_profiles").select("*", { count: "exact", head: true }).eq("verification_status", "verified"),
-    supabase.from("artisan_profiles").select("*", { count: "exact", head: true }).eq("verification_status", "pending"),
   ]);
 
   // 2. Request Fulfillment Metrics
@@ -109,30 +103,25 @@ export default async function AdminAnalyticsPage() {
   const cancellationRate = totalRequests ? Math.round(((cancelledRequests || 0) / reqTotal) * 100) : 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-900 text-white p-6 sm:p-8 rounded-3xl shadow-sm">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-              Marketplace Intelligence
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black">Platform Metrics & Health Analytics</h1>
-          <p className="text-xs text-neutral-400 max-w-2xl">
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#ea580c]">
+            Marketplace Intelligence
+          </span>
+          <h1 className="text-2xl font-black text-[#0f2942] tracking-tight">Platform Metrics & Health Analytics</h1>
+          <p className="text-xs text-slate-500 mt-1">
             Real-time aggregate data covering supply (artisans & services), demand (client requests & bookings),
             and trust (verification & ratings) across Osogbo.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-neutral-800 text-xs text-neutral-300 shrink-0">
-          <BarChart3 className="h-4 w-4 text-emerald-400" />
-          <span>Real-Time Engine</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white border border-slate-200/90 text-xs text-slate-600 shadow-2xs shrink-0 self-start sm:self-center">
+          <BarChart3 className="h-4 w-4 text-emerald-600" />
+          <span className="font-semibold">Real-Time Engine Active</span>
         </div>
       </div>
-
-      {/* Admin Navigation */}
-      <AdminNav pendingVerifications={pendingVerifications || 0} />
 
       {/* Top Level Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -321,7 +310,11 @@ export default async function AdminAnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-xs">
-            <div className="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+              <div className="space-y-1">
+                <span className="text-slate-400 block font-medium">Total Registered</span>
+                <span className="text-lg font-bold text-[#0f2942]">{totalUsers || 0}</span>
+              </div>
               <div className="space-y-1">
                 <span className="text-slate-400 block font-medium">Customer Accounts</span>
                 <span className="text-lg font-bold text-[#0f2942]">{totalCustomers || 0}</span>
@@ -329,6 +322,10 @@ export default async function AdminAnalyticsPage() {
               <div className="space-y-1">
                 <span className="text-slate-400 block font-medium">Artisan Accounts</span>
                 <span className="text-lg font-bold text-[#0f2942]">{totalArtisans || 0}</span>
+              </div>
+              <div className="space-y-1">
+                <span className="text-slate-400 block font-medium">Active Catalog</span>
+                <span className="text-lg font-bold text-emerald-600">{activeServicesCount}</span>
               </div>
               <div className="space-y-1">
                 <span className="text-slate-400 block font-medium">Suspended Accounts</span>

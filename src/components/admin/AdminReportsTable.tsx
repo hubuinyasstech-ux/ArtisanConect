@@ -4,18 +4,12 @@ import React, { useState } from "react";
 import { resolveReport, dismissReport } from "@/app/actions/admin";
 import { ReportStatus } from "@/types/database.types";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
-  AlertTriangle,
   CheckCircle2,
   XCircle,
   AlertCircle,
   Loader2,
-  Calendar,
-  User,
-  Layers,
-  Inbox,
   Clock,
 } from "lucide-react";
 

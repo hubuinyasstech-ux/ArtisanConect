@@ -7,20 +7,15 @@ import { ModerationStatus } from "@/types/database.types";
 import { formatNaira } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
-  Layers,
   Search,
   Eye,
   EyeOff,
-  AlertTriangle,
   CheckCircle2,
   AlertCircle,
   ExternalLink,
-  MapPin,
   Loader2,
-  Calendar,
 } from "lucide-react";
 
 export interface AdminServiceItem {

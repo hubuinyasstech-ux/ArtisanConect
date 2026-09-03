@@ -35,6 +35,14 @@ export async function createService(formData: FormData): Promise<ActionResponse>
       return { error: "Please provide a valid starting price." };
     }
 
+    const photoUrl = (formData.get("photo_url") as string)?.trim();
+    if (photoUrl && user) {
+      await supabase
+        .from("profiles")
+        .update({ avatar_url: photoUrl, updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+    }
+
     const { data: newService, error: insertErr } = await supabase
       .from("services")
       .insert({
@@ -111,6 +119,14 @@ export async function updateService(
     const price = parseFloat(priceStr);
     if (isNaN(price) || price < 0) {
       return { error: "Please provide a valid starting price." };
+    }
+
+    const photoUrl = (formData.get("photo_url") as string)?.trim();
+    if (photoUrl && user) {
+      await supabase
+        .from("profiles")
+        .update({ avatar_url: photoUrl, updated_at: new Date().toISOString() })
+        .eq("id", user.id);
     }
 
     const { error: updateErr } = await supabase

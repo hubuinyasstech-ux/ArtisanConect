@@ -36,6 +36,9 @@ export default async function CustomerProfilePage() {
       avatar_url: null,
       location: user.user_metadata?.location || "Osogbo, Osun State",
       bio: null,
+      status: "active",
+      suspension_reason: null,
+      suspended_at: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

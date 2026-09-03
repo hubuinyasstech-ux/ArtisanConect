@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/types/database.types";
@@ -10,8 +9,9 @@ import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { formatNigerianPhone } from "@/lib/utils";
-import { User, Phone, MapPin, Mail, Shield, Save, Image as ImageIcon } from "lucide-react";
+import { User, Phone, MapPin, Mail, Shield, Save } from "lucide-react";
 
 interface ProfileFormProps {
   initialProfile: Profile;
@@ -117,33 +117,14 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
             </div>
           </div>
 
-          {/* Avatar Preview & URL */}
-          <div className="flex items-center gap-4 pt-1">
-            <div className="relative h-16 w-16 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt="Profile Avatar"
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <User className="h-8 w-8 text-slate-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              <Input
-                label="Profile Picture URL"
-                type="url"
-                placeholder="https://example.com/avatar.jpg"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                helperText="Link to your profile photo"
-                leftIcon={<ImageIcon className="h-4 w-4" />}
-              />
-            </div>
-          </div>
+          {/* Avatar / Profile Picture */}
+          <ImageUpload
+            label="Profile Photo"
+            helperText="Upload a profile photo from your phone or computer, or provide an image URL."
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+            shape="circle"
+          />
 
           <Input
             label="Full Name"

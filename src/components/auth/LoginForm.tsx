@@ -51,7 +51,12 @@ export function LoginForm() {
       const role = profile?.role || data.user.user_metadata?.role || "customer";
 
       if (redirectParam) {
-        router.push(redirectParam);
+        // Prevent unauthorized redirect to /admin routes if user is not an administrator
+        if (redirectParam.startsWith("/admin") && role !== "admin") {
+          router.push(role === "artisan" ? "/artisan/dashboard" : "/customer/dashboard");
+        } else {
+          router.push(redirectParam);
+        }
       } else if (role === "artisan") {
         router.push("/artisan/dashboard");
       } else if (role === "admin") {

@@ -9,15 +9,35 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Alert } from "@/components/ui/Alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Wrench, MapPin, CheckCircle2, ArrowLeft } from "lucide-react";
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import {
+  Wrench,
+  MapPin,
+  CheckCircle2,
+  ArrowLeft,
+  Zap,
+  Hammer,
+  Paintbrush,
+  Sparkles,
+  Flame,
+  Tv,
+  Home,
+  Car,
+  Briefcase,
+} from "lucide-react";
 import Link from "next/link";
 
 interface ServiceFormProps {
   initialService?: Service;
+  initialArtisanPhoto?: string | null;
   isEditing?: boolean;
 }
 
-export function ServiceForm({ initialService, isEditing = false }: ServiceFormProps) {
+export function ServiceForm({
+  initialService,
+  initialArtisanPhoto,
+  isEditing = false,
+}: ServiceFormProps) {
   const router = useRouter();
 
   const [title, setTitle] = useState(initialService?.title || "");
@@ -30,16 +50,22 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
   const [isActive, setIsActive] = useState<boolean>(
     initialService ? initialService.is_active : true
   );
+  const [artisanPhoto, setArtisanPhoto] = useState<string>(initialArtisanPhoto || "");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const categories = [
-    { value: "Plumbing", label: "Plumbing" },
-    { value: "Electrical", label: "Electrical" },
-    { value: "Carpentry", label: "Carpentry" },
-    { value: "Painting", label: "Painting" },
-    { value: "Cleaning", label: "Cleaning" },
+    { value: "Plumbing", label: "Plumbing", icon: <Wrench className="h-3.5 w-3.5" /> },
+    { value: "Electrical", label: "Electrical", icon: <Zap className="h-3.5 w-3.5" /> },
+    { value: "Carpentry", label: "Carpentry", icon: <Hammer className="h-3.5 w-3.5" /> },
+    { value: "Painting", label: "Painting", icon: <Paintbrush className="h-3.5 w-3.5" /> },
+    { value: "Cleaning", label: "Cleaning", icon: <Sparkles className="h-3.5 w-3.5" /> },
+    { value: "Masonry & Tiling", label: "Masonry & Tiling", icon: <Briefcase className="h-3.5 w-3.5" /> },
+    { value: "Welding & Metalwork", label: "Welding & Metalwork", icon: <Flame className="h-3.5 w-3.5" /> },
+    { value: "Appliance & AC Repair", label: "Appliance & AC Repair", icon: <Tv className="h-3.5 w-3.5" /> },
+    { value: "Roofing & Waterproofing", label: "Roofing & Waterproofing", icon: <Home className="h-3.5 w-3.5" /> },
+    { value: "Automobile Mechanics", label: "Automobile Mechanics", icon: <Car className="h-3.5 w-3.5" /> },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,11 +92,15 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
     formData.append("price", priceNum.toString());
     formData.append("location", location.trim());
     formData.append("is_active", isActive ? "true" : "false");
+    if (artisanPhoto) {
+      formData.append("photo_url", artisanPhoto);
+    }
 
     try {
-      const result = isEditing && initialService
-        ? await updateService(initialService.id, formData)
-        : await createService(formData);
+      const result =
+        isEditing && initialService
+          ? await updateService(initialService.id, formData)
+          : await createService(formData);
 
       if (result.error) {
         setError(result.error);
@@ -102,18 +132,30 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
           {isEditing ? "Edit Service Offering" : "Add New Service Offering"}
         </CardTitle>
         <CardDescription className="text-sm text-slate-500">
-          Define clear service packages with transparent starting estimates for customers in Osogbo
+          Define clear service packages with your trade specialization, transparent pricing, and artisan photo for customers in Osogbo
         </CardDescription>
       </CardHeader>
 
       <CardContent className="px-6 sm:px-8 pb-8">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <Alert variant="error" title="Submission Error">
               {error}
             </Alert>
           )}
 
+          {/* 1. Artisan Photo Upload */}
+          <div className="space-y-1">
+            <ImageUpload
+              label="Artisan Photo / Headshot"
+              helperText="Upload your clear professional photo or business image. This photo will appear on your public profile and alongside your services."
+              value={artisanPhoto}
+              onChange={setArtisanPhoto}
+              shape="rounded"
+            />
+          </div>
+
+          {/* 2. Service Title */}
           <Input
             label="Service Title"
             type="text"
@@ -125,16 +167,46 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
             leftIcon={<Wrench className="h-4 w-4" />}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* 3. Type of Service Offered (Trade Classification) */}
+          <div className="space-y-2.5 text-left">
+            <label className="block text-sm font-semibold text-slate-800">
+              Type of Service Offered (Select Trade)
+            </label>
+            
+            {/* Quick-select Trade Pills */}
+            <div className="flex flex-wrap gap-1.5 pb-1">
+              {categories.map((c) => {
+                const isSelected = category === c.value;
+                return (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setCategory(c.value)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                      isSelected
+                        ? "bg-[#0f2942] text-white shadow-xs"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    }`}
+                  >
+                    <span>{c.icon}</span>
+                    <span>{c.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             <Select
-              label="Service Category"
+              label="Or choose from full list"
               required
-              options={categories}
+              options={categories.map((c) => ({ value: c.value, label: c.label }))}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              helperText="Trade classification"
+              helperText="Primary trade category for customer search filtering"
             />
+          </div>
 
+          {/* 4. Pricing & Location */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Starting Estimate (₦ NGN)"
               type="number"
@@ -147,19 +219,20 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
               helperText="Starting labor price before materials"
               leftIcon={<span className="text-sm font-bold text-slate-500">₦</span>}
             />
+
+            <Input
+              label="Service Area / Location"
+              type="text"
+              required
+              placeholder="e.g. Osogbo, Osun State"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              helperText="Specific neighborhood or coverage area"
+              leftIcon={<MapPin className="h-4 w-4" />}
+            />
           </div>
 
-          <Input
-            label="Service Area / Location"
-            type="text"
-            required
-            placeholder="e.g. Osogbo, Osun State"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            helperText="Specific neighborhood or coverage radius"
-            leftIcon={<MapPin className="h-4 w-4" />}
-          />
-
+          {/* 5. Service Description & Scope */}
           <div className="space-y-1.5 text-left">
             <label className="block text-sm font-semibold text-slate-800">
               Service Description & Scope
@@ -169,16 +242,16 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain what is included in this service, response time, warranty on labor, and any client preparation needed..."
+                placeholder="Explain what is included in this service, typical response time, warranty on labor, and any client preparation needed..."
                 className="block w-full rounded-xl border border-slate-300 bg-white p-3.5 text-slate-900 text-sm placeholder:text-slate-400 focus:border-[#ea580c] focus:outline-none focus:ring-3 focus:ring-[#ea580c]/10 transition-all duration-150"
               />
             </div>
             <p className="text-xs text-slate-500">
-              Clear job descriptions minimize disputes and boost client bookings.
+              Clear job descriptions minimize misunderstandings and boost client bookings.
             </p>
           </div>
 
-          {/* Active Toggle Switch */}
+          {/* 6. Active Toggle Switch */}
           <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200">
             <div>
               <p className="text-sm font-bold text-slate-900">Service Status</p>
@@ -197,6 +270,7 @@ export function ServiceForm({ initialService, isEditing = false }: ServiceFormPr
             </label>
           </div>
 
+          {/* 7. Action Buttons */}
           <div className="flex items-center justify-end gap-3 pt-2">
             <Link href="/artisan/services">
               <Button variant="ghost" size="md">

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Profile, ArtisanProfile, AvailabilityStatus } from "@/types/database.types";
@@ -11,6 +10,7 @@ import { Select } from "@/components/ui/Select";
 import { Alert } from "@/components/ui/Alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { formatNigerianPhone } from "@/lib/utils";
 import {
   Briefcase,
@@ -22,7 +22,6 @@ import {
   Clock,
   CircleDot,
   Star,
-  Image as ImageIcon,
   User,
 } from "lucide-react";
 
@@ -55,7 +54,7 @@ export function ArtisanProfileForm({
     initialArtisanProfile?.years_experience?.toString() || "3"
   );
   const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>(
-    initialArtisanProfile?.availability_status || "available"
+    (initialArtisanProfile?.availability_status as AvailabilityStatus) || "available"
   );
 
   const [loading, setLoading] = useState(false);
@@ -220,32 +219,13 @@ export function ArtisanProfileForm({
           </div>
 
           {/* Profile Photo / Avatar */}
-          <div className="flex items-center gap-4">
-            <div className="relative h-20 w-20 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt="Artisan Photo"
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <User className="h-10 w-10 text-slate-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              <Input
-                label="Profile / Business Photo URL"
-                type="url"
-                placeholder="https://example.com/artisan-photo.jpg"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                helperText="Link to your professional work photo or business logo"
-                leftIcon={<ImageIcon className="h-4 w-4" />}
-              />
-            </div>
-          </div>
+          <ImageUpload
+            label="Profile / Business Photo"
+            helperText="Upload a professional photo or business logo from your device, or provide an image link."
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+            shape="rounded"
+          />
 
           {/* Business & Personal Name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

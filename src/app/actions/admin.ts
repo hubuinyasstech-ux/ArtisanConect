@@ -298,7 +298,13 @@ export async function moderateService(
       return { error: authErr || "Unauthorized." };
     }
 
-    const updatePayload: Record<string, unknown> = {
+    const updatePayload: {
+      moderation_status: string;
+      moderation_reason: string | null;
+      moderated_at: string;
+      moderated_by: string;
+      is_active?: boolean;
+    } = {
       moderation_status: status,
       moderation_reason: reason?.trim() || null,
       moderated_at: new Date().toISOString(),
