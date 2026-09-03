@@ -3,7 +3,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const { supabaseResponse, user, userRole } = await updateSession(request);
+  const { supabaseResponse, user, userRole, userStatus } = await updateSession(request);
 
   const isAuthRoute =
     pathname.startsWith("/login") ||
@@ -22,6 +22,11 @@ export async function proxy(request: NextRequest) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(redirectUrl);
+  }
+
+  // 2. Suspended users trying to access protected features -> Redirect to Suspended page
+  if (user && isProtectedRoute && userStatus === "suspended" && pathname !== "/suspended") {
+    return NextResponse.redirect(new URL("/suspended", request.url));
   }
 
   // 2. Authenticated users trying to access Auth routes (login/register) -> Redirect to their role dashboard

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireActiveUser } from "@/lib/auth/admin";
 
 export interface CreateReviewPayload {
   request_id: string;
@@ -19,12 +20,10 @@ export async function createReview(
 ): Promise<ReviewActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "You must be logged in to submit a review." };
+    if (authErr || !user) {
+      return { error: authErr || "You must be logged in to submit a review." };
     }
 
     const { request_id, rating, comment } = payload;

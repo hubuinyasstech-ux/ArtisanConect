@@ -49,6 +49,10 @@ export type Database = {
           rating: number
           updated_at: string
           user_id: string
+          verification_notes: string | null
+          verification_requested_at: string | null
+          verification_reviewed_at: string | null
+          verification_reviewed_by: string | null
           verification_status: string
           years_experience: number
         }
@@ -61,6 +65,10 @@ export type Database = {
           rating?: number
           updated_at?: string
           user_id: string
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
           verification_status?: string
           years_experience?: number
         }
@@ -73,6 +81,10 @@ export type Database = {
           rating?: number
           updated_at?: string
           user_id?: string
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
           verification_status?: string
           years_experience?: number
         }
@@ -81,6 +93,13 @@ export type Database = {
             foreignKeyName: "artisan_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artisan_profiles_verification_reviewed_by_fkey"
+            columns: ["verification_reviewed_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -178,6 +197,9 @@ export type Database = {
           location: string | null
           phone: string | null
           role: string
+          status: string
+          suspended_at: string | null
+          suspension_reason: string | null
           updated_at: string
         }
         Insert: {
@@ -190,6 +212,9 @@ export type Database = {
           location?: string | null
           phone?: string | null
           role: string
+          status?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Update: {
@@ -202,9 +227,96 @@ export type Database = {
           location?: string | null
           phone?: string | null
           role?: string
+          status?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          reason: string
+          reported_user_id: string | null
+          reporter_id: string
+          request_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          service_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          reason: string
+          reported_user_id?: string | null
+          reporter_id: string
+          request_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          reason?: string
+          reported_user_id?: string | null
+          reporter_id?: string
+          request_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -340,6 +452,10 @@ export type Database = {
           id: string
           is_active: boolean
           location: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_reason: string | null
+          moderation_status: string
           price: number
           title: string
           updated_at: string
@@ -352,6 +468,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           location?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string
           price?: number
           title: string
           updated_at?: string
@@ -364,6 +484,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           location?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string
           price?: number
           title?: string
           updated_at?: string
@@ -374,6 +498,13 @@ export type Database = {
             columns: ["artisan_id"]
             isOneToOne: false
             referencedRelation: "artisan_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_moderated_by_fkey"
+            columns: ["moderated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -518,117 +649,41 @@ export const Constants = {
   public: {
     Enums: {},
   },
-} as const;
+} as const
 
-// ==========================================
-// APPLICATION CONVENIENCE TYPES
-// ==========================================
-
-export type Role = "customer" | "artisan" | "admin";
-export type UserRole = Role;
-
+// Application Domain Helper Types
+export type UserRole = "customer" | "artisan" | "admin";
+export type AccountStatus = "active" | "suspended";
 export type AvailabilityStatus = "available" | "busy" | "offline";
-export type VerificationStatus = "unverified" | "pending" | "verified";
-
+export type VerificationStatus = "unverified" | "pending" | "verified" | "rejected";
+export type ModerationStatus = "active" | "hidden" | "under_review";
 export type ServiceRequestStatus =
   | "pending"
   | "accepted"
   | "declined"
-  | "completed"
-  | "cancelled";
-
+  | "cancelled"
+  | "completed";
 export type NotificationType =
   | "new_request"
   | "request_accepted"
   | "request_declined"
   | "request_cancelled"
   | "request_completed"
-  | "new_review";
+  | "new_review"
+  | "verification_submitted"
+  | "verification_approved"
+  | "verification_rejected"
+  | "report_submitted"
+  | "report_resolved"
+  | "account_suspended";
+export type ReportStatus = "open" | "under_review" | "resolved" | "dismissed";
 
-export type Profile = {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  phone: string | null;
-  location: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  role: Role;
-  created_at: string;
-  updated_at: string;
-};
+export type Profile = Tables<"profiles">;
+export type ArtisanProfile = Tables<"artisan_profiles">;
+export type Category = Tables<"categories">;
+export type Service = Tables<"services">;
+export type ServiceRequest = Tables<"service_requests">;
+export type Notification = Tables<"notifications">;
+export type Review = Tables<"reviews">;
+export type Report = Tables<"reports">;
 
-export type Category = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  icon: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-export type ArtisanProfile = {
-  id: string;
-  user_id: string;
-  business_name: string;
-  category: string;
-  years_experience: number;
-  availability_status: AvailabilityStatus;
-  verification_status: VerificationStatus;
-  rating: number;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Service = {
-  id: string;
-  artisan_id: string;
-  title: string;
-  description: string | null;
-  price: number;
-  category: string;
-  location: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-export type ServiceRequest = {
-  id: string;
-  customer_id: string;
-  artisan_id: string;
-  service_id: string | null;
-  description: string;
-  preferred_date: string | null;
-  preferred_time: string | null;
-  location: string;
-  notes: string | null;
-  status: ServiceRequestStatus;
-  decline_reason: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Notification = {
-  id: string;
-  user_id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  is_read: boolean;
-  related_request_id: string | null;
-  created_at: string;
-};
-
-export type Review = {
-  id: string;
-  request_id: string;
-  customer_id: string;
-  artisan_id: string;
-  rating: number;
-  comment: string | null;
-  created_at: string;
-  updated_at: string;
-};

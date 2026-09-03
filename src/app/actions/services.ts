@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireArtisan } from "@/lib/auth/admin";
 
 export type ActionResponse = {
   success?: boolean;
@@ -12,26 +13,10 @@ export type ActionResponse = {
 export async function createService(formData: FormData): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, artisanProfile, error: authErr } = await requireArtisan(supabase);
 
-    if (!user) {
-      return { error: "Authentication required to create a service." };
-    }
-
-    // Get the artisan profile
-    const { data: artisanProfile, error: profileErr } = await supabase
-      .from("artisan_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
-
-    if (profileErr || !artisanProfile) {
-      return {
-        error:
-          "Please complete your business profile before creating services.",
-      };
+    if (authErr || !user || !artisanProfile) {
+      return { error: authErr || "Authentication required to create a service." };
     }
 
     const title = (formData.get("title") as string)?.trim();
@@ -60,6 +45,7 @@ export async function createService(formData: FormData): Promise<ActionResponse>
         price,
         location,
         is_active: isActive,
+        moderation_status: "active",
       })
       .select("id")
       .single();
@@ -86,23 +72,29 @@ export async function updateService(
 ): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, artisanProfile, error: authErr } = await requireArtisan(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user || !artisanProfile) {
+      return { error: authErr || "Authentication required." };
     }
 
-    // Verify ownership via artisan_profiles
-    const { data: artisanProfile } = await supabase
-      .from("artisan_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
+    // Check existing service and its moderation status
+    const { data: existingService, error: fetchErr } = await supabase
+      .from("services")
+      .select("id, moderation_status, is_active")
+      .eq("id", serviceId)
+      .eq("artisan_id", artisanProfile.id)
+      .maybeSingle();
 
-    if (!artisanProfile) {
-      return { error: "Unauthorized. Artisan profile not found." };
+    if (fetchErr || !existingService) {
+      return { error: "Service not found or you do not have permission to edit it." };
+    }
+
+    if (existingService.moderation_status === "hidden") {
+      return {
+        error:
+          "This service has been hidden by platform administrators due to a moderation review. It cannot be edited or republished without admin clearance.",
+      };
     }
 
     const title = (formData.get("title") as string)?.trim();
@@ -158,22 +150,29 @@ export async function toggleServiceStatus(
 ): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, artisanProfile, error: authErr } = await requireArtisan(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user || !artisanProfile) {
+      return { error: authErr || "Authentication required." };
     }
 
-    const { data: artisanProfile } = await supabase
-      .from("artisan_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
+    // Verify service and moderation status
+    const { data: existingService, error: fetchErr } = await supabase
+      .from("services")
+      .select("id, moderation_status")
+      .eq("id", serviceId)
+      .eq("artisan_id", artisanProfile.id)
+      .maybeSingle();
 
-    if (!artisanProfile) {
-      return { error: "Unauthorized." };
+    if (fetchErr || !existingService) {
+      return { error: "Service not found or unauthorized." };
+    }
+
+    if (existingService.moderation_status === "hidden" && isActive) {
+      return {
+        error:
+          "This service has been hidden by platform administrators. You cannot activate a moderated service.",
+      };
     }
 
     const { error: updateErr } = await supabase
@@ -202,22 +201,10 @@ export async function toggleServiceStatus(
 export async function deleteService(serviceId: string): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, artisanProfile, error: authErr } = await requireArtisan(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
-    }
-
-    const { data: artisanProfile } = await supabase
-      .from("artisan_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
-
-    if (!artisanProfile) {
-      return { error: "Unauthorized." };
+    if (authErr || !user || !artisanProfile) {
+      return { error: authErr || "Authentication required." };
     }
 
     const { error: deleteErr } = await supabase

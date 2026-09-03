@@ -37,26 +37,23 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   let userRole: string | null = null;
+  let userStatus: string = "active";
 
   if (user) {
-    // Fast path: use user_metadata directly from the authenticated session (avoids extra network hop)
-    userRole = user.user_metadata?.role || null;
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, status")
+        .eq("id", user.id)
+        .maybeSingle();
 
-    // Fallback: only query database if role was not in metadata
-    if (!userRole) {
-      try {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        userRole = profile?.role || "customer";
-      } catch {
-        userRole = "customer";
-      }
+      userRole = profile?.role || user.user_metadata?.role || "customer";
+      userStatus = profile?.status || "active";
+    } catch {
+      userRole = user.user_metadata?.role || "customer";
+      userStatus = "active";
     }
   }
 
-  return { supabaseResponse, user, userRole };
+  return { supabaseResponse, user, userRole, userStatus };
 }

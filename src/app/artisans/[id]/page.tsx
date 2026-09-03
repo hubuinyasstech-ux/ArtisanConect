@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { ArtisanServicesSection } from "@/components/artisan/ArtisanServicesSection";
 import { ReviewList, ReviewItem } from "@/components/reviews/ReviewList";
+import { ArtisanReportButton } from "@/components/reports/ArtisanReportButton";
 
 interface ArtisanPublicProfilePageProps {
   params: Promise<{ id: string }>;
@@ -591,6 +592,14 @@ export default async function ArtisanPublicProfilePage({
             <p className="leading-relaxed text-[11px]">
               Inspect completed work before releasing final payment. For large projects, agree upon milestone installments in writing.
             </p>
+          </div>
+
+          <div className="text-center pt-2">
+            <ArtisanReportButton
+              artisanId={profileData.id}
+              artisanUserId={profileData.user_id}
+              businessName={profileData.business_name}
+            />
           </div>
         </div>
       </div>

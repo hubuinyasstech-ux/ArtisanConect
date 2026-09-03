@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireActiveUser } from "@/lib/auth/admin";
 
 export interface ActionResponse<T = unknown> {
   success?: boolean;
@@ -24,12 +25,10 @@ export async function createServiceRequest(
 ): Promise<ActionResponse<{ requestId: string }>> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "You must be logged in to request a service." };
+    if (authErr || !user) {
+      return { error: authErr || "You must be logged in to request a service." };
     }
 
     const { artisan_id, service_id, description, preferred_date, preferred_time, location, notes } =
@@ -150,12 +149,10 @@ export async function createServiceRequest(
 export async function acceptServiceRequest(requestId: string): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user) {
+      return { error: authErr || "Authentication required." };
     }
 
     const { data: artisan } = await supabase
@@ -228,12 +225,10 @@ export async function declineServiceRequest(
 ): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user) {
+      return { error: authErr || "Authentication required." };
     }
 
     const { data: artisan } = await supabase
@@ -306,12 +301,10 @@ export async function declineServiceRequest(
 export async function cancelServiceRequest(requestId: string): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user) {
+      return { error: authErr || "Authentication required." };
     }
 
     const { data: request } = await supabase
@@ -386,12 +379,10 @@ export async function cancelServiceRequest(requestId: string): Promise<ActionRes
 export async function completeServiceRequest(requestId: string): Promise<ActionResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { user, error: authErr } = await requireActiveUser(supabase);
 
-    if (!user) {
-      return { error: "Authentication required." };
+    if (authErr || !user) {
+      return { error: authErr || "Authentication required." };
     }
 
     const { data: artisan } = await supabase

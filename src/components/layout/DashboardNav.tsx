@@ -12,6 +12,7 @@ import {
   Layers,
   Inbox,
   CalendarCheck,
+  ShieldCheck,
 } from "lucide-react";
 import { UserRole } from "@/types/database.types";
 
@@ -71,6 +72,11 @@ export function DashboardNav({ role }: DashboardNavProps) {
       label: "Business Profile",
       href: "/artisan/profile",
       icon: <Briefcase className="h-4 w-4" />,
+    },
+    {
+      label: "Verification",
+      href: "/artisan/verification",
+      icon: <ShieldCheck className="h-4 w-4" />,
     },
   ];
 
