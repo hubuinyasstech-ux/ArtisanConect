@@ -46,3 +46,47 @@ export async function updateAvailability(
     return { error: "Failed to update availability status." };
   }
 }
+
+/**
+ * Updates the artisan's profile picture for their ID card and public showcase.
+ */
+export async function updateArtisanPhoto(photoUrl: string): Promise<ActionResponse> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { error: "Authentication required." };
+    }
+
+    if (!photoUrl?.trim()) {
+      return { error: "A valid photo must be provided." };
+    }
+
+    const { error: updateErr } = await supabase
+      .from("profiles")
+      .update({
+        avatar_url: photoUrl.trim(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (updateErr) {
+      console.error("Error updating artisan photo:", updateErr);
+      return { error: updateErr.message };
+    }
+
+    revalidatePath("/artisan/dashboard");
+    revalidatePath("/artisan/profile");
+    revalidatePath("/artisan/services");
+    revalidatePath("/find-artisans");
+
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Unexpected error in updateArtisanPhoto:", err);
+    return { error: "Failed to save profile picture." };
+  }
+}
+

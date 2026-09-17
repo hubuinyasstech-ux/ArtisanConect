@@ -21,6 +21,7 @@ import {
   Layers,
 } from "lucide-react";
 import { ArtisanAvailabilityToggle } from "@/components/artisan/ArtisanAvailabilityToggle";
+import { ArtisanIdCardTrigger } from "@/components/artisan/ArtisanIdCardTrigger";
 import { ArtisanProfile, Service, AvailabilityStatus } from "@/types/database.types";
 import { formatNaira } from "@/lib/utils";
 
@@ -164,6 +165,18 @@ export default async function ArtisanDashboardPage() {
 
       {/* Role Navigation */}
       <DashboardNav role="artisan" />
+
+      {/* Official Artisan Identification Card Generator */}
+      <ArtisanIdCardTrigger
+        artisan={typedArtisan}
+        profile={{
+          full_name: profile?.full_name || typedArtisan.business_name,
+          email: profile?.email || user.email || "",
+          phone: profile?.phone,
+          avatar_url: profile?.avatar_url,
+          location: artisanLocation,
+        }}
+      />
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

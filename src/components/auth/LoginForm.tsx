@@ -50,17 +50,15 @@ export function LoginForm() {
 
       const role = profile?.role || data.user.user_metadata?.role || "customer";
 
-      if (redirectParam) {
-        // Prevent unauthorized redirect to /admin routes if user is not an administrator
-        if (redirectParam.startsWith("/admin") && role !== "admin") {
-          router.push(role === "artisan" ? "/artisan/dashboard" : "/customer/dashboard");
-        } else {
-          router.push(redirectParam);
-        }
+      if (redirectParam && !redirectParam.startsWith("/admin")) {
+        router.push(redirectParam);
       } else if (role === "artisan") {
         router.push("/artisan/dashboard");
       } else if (role === "admin") {
-        router.push("/admin/dashboard");
+        const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001";
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.href = `${adminUrl}/dashboard`;
+        return;
       } else {
         router.push("/customer/dashboard");
       }
